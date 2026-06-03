@@ -1,0 +1,47 @@
+meta {
+  name: 10. Admin List Notifications
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/v1/admin/notifications?limit=20&page=1
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  # Admin List Notifications
+
+  Admin audit endpoint for notifications created or sent by the backend.
+
+  ## Endpoint
+
+  `GET /api/v1/admin/notifications`
+
+  ## Authentication
+
+  Admin JWT required.
+
+  ## Query Params
+
+  `page`
+  Optional.
+
+  `limit`
+  Optional.
+
+  `type`
+  Optional. Filter by notification type.
+
+  `userId`
+  Optional. Filter notifications for one user.
+}
