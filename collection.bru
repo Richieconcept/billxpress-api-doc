@@ -1,13 +1,13 @@
 meta {
-  name: Billxpress Backend API
+  name: BillXpress Backend API
   type: collection
   version: 1
 }
 
 docs {
-  # Billxpress Backend API
+  # BillXpress Backend API
 
-  This Bruno collection documents the Billxpress backend endpoints for frontend developers and testers.
+  This Bruno collection documents the BillXpress backend endpoints for frontend developers and testers.
 
   ## Base URLs
 
@@ -36,6 +36,7 @@ docs {
   4. Run `Login User`. This saves the JWT into `authToken`.
   5. Run `Get Current User` to confirm the token works.
   6. Run wallet requests such as `Get Wallet`, `Get Virtual Account`, or `Create One-Time Funding Account`.
+  7. Run service requests such as `Data Plans` and `Purchase Data`.
 
   Every protected endpoint needs:
 
@@ -64,7 +65,7 @@ docs {
 
   ## Important Auth Rule
 
-  Billxpress does not block login when email is unverified. New users start at `authTier: "tier_1"`. Later dollar card, betting, BVN/KYC, wallet limits, and other sensitive service actions can require a higher `authTier`.
+  BillXpress does not block login when email is unverified. New users start at `authTier: "tier_1"`. Later dollar card, betting, BVN/KYC, wallet limits, and other sensitive service actions can require a higher `authTier`.
 
   ## Frontend Registration Rule
 
@@ -83,7 +84,7 @@ docs {
 
   ## Wallet Funding Rule
 
-  The frontend should use only Billxpress API endpoints. Do not call PocketFi or Monnify directly from the app.
+  The frontend should use only BillXpress API endpoints. Do not call PocketFi or Monnify directly from the app.
 
   Permanent funding account:
 
@@ -106,4 +107,44 @@ docs {
   The frontend should never credit the wallet itself. The backend credits the wallet after webhook confirmation or Monnify status confirmation.
 
   Referral earnings are redeemed into the user's main wallet, not withdrawn to bank.
+
+  ## Data Service Rule
+
+  The frontend should fetch data plans from:
+
+  ```txt
+  GET /api/v1/services/data/plans
+  ```
+
+  The backend fetches live plans from the active provider, applies BillXpress markup, and returns `sellingPrice`.
+
+  When buying data, send:
+
+  ```txt
+  POST /api/v1/services/data/purchase
+  ```
+
+  The backend debits the wallet, calls the active provider, and refunds automatically if the provider fails.
+
+  ## Airtime Service Rule
+
+  The frontend should fetch airtime networks from:
+
+  ```txt
+  GET /api/v1/services/airtime/networks
+  ```
+
+  The user enters the airtime amount. Frontend can call:
+
+  ```txt
+  POST /api/v1/services/airtime/quote
+  ```
+
+  Then purchase with:
+
+  ```txt
+  POST /api/v1/services/airtime/purchase
+  ```
+
+  The backend calculates markup, debits wallet, calls the active provider, and refunds automatically if the provider fails.
 }
