@@ -20,26 +20,36 @@ auth:bearer {
 
 docs {
   # Admin Get Data Settings
-
+  
   Admin checks the active data provider and markup settings.
 
+  Use this request after updating data settings to confirm what is active.
+
+  If `userPricingTiers` or `vendorPricingTiers` is not empty, tiered pricing is enabled.
+
+  If a plan does not match any tier, backend falls back to `userMarkupPercent` or `vendorMarkupPercent`.
+  
   ## Endpoint
-
+  
   `GET /api/v1/admin/services/data/settings`
-
+  
   ## Authentication
-
+  
   Admin JWT required.
-
+  
   ## Expected Response
-
+  
   ```json
   {
     "settings": {
       "service": "data",
       "isEnabled": true,
-      "activeProvider": "ujaydata",
+      "activeProvider": "smeapi",
       "availableProviders": [
+        {
+          "name": "smeapi",
+          "available": true
+        },
         {
           "name": "ujaydata",
           "available": true
@@ -47,6 +57,30 @@ docs {
       ],
       "userMarkupPercent": 15,
       "vendorMarkupPercent": 10,
+      "userPricingTiers": [
+        {
+          "minCost": 0,
+          "maxCost": 500,
+          "markupPercent": 15
+        },
+        {
+          "minCost": 6001,
+          "maxCost": null,
+          "markupPercent": 3
+        }
+      ],
+      "vendorPricingTiers": [
+        {
+          "minCost": 0,
+          "maxCost": 500,
+          "markupPercent": 10
+        },
+        {
+          "minCost": 6001,
+          "maxCost": null,
+          "markupPercent": 2
+        }
+      ],
       "roundingMode": "ceil"
     }
   }

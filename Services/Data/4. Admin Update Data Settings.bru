@@ -25,53 +25,188 @@ body:json {
     "activeProvider": "ujaydata",
     "userMarkupPercent": 15,
     "vendorMarkupPercent": 10,
-    "roundingMode": "ceil"
+    "roundingMode": "ceil",
+    "userPricingTiers": [
+      { "minCost": 0, "maxCost": 500, "markupPercent": 15 },
+      { "minCost": 501, "maxCost": 1500, "markupPercent": 10 },
+      { "minCost": 1501, "maxCost": 3000, "markupPercent": 7 },
+      { "minCost": 3001, "maxCost": 6000, "markupPercent": 5 },
+      { "minCost": 6001, "maxCost": null, "markupPercent": 3 }
+    ],
+    "vendorPricingTiers": [
+      { "minCost": 0, "maxCost": 500, "markupPercent": 10 },
+      { "minCost": 501, "maxCost": 1500, "markupPercent": 7 },
+      { "minCost": 1501, "maxCost": 3000, "markupPercent": 5 },
+      { "minCost": 3001, "maxCost": 6000, "markupPercent": 3 },
+      { "minCost": 6001, "maxCost": null, "markupPercent": 2 }
+    ]
   }
 }
 
 docs {
   # Admin Update Data Settings
-
+  
   Admin updates data service provider and markup settings.
 
+  Use this request when admin wants to:
+
+  - switch between `smeapi` and `ujaydata`
+  - change normal user fallback percentage
+  - change vendor fallback percentage
+  - configure tiered margins so small plans stay profitable and big plans stay affordable
+  
+  This request must be sent as raw JSON with:
+  
+  ```txt
+  Content-Type: application/json
+  ```
+  
+  If the body is not sent as JSON, the backend will not receive the fields correctly.
+  
   ## Endpoint
-
+  
   `PATCH /api/v1/admin/services/data/settings`
-
+  
   ## Authentication
-
+  
   Admin JWT required.
-
+  
   ## Body Fields
-
+  
   `isEnabled`
   Use `true` to allow data purchases or `false` to temporarily disable data service.
-
+  
   `activeProvider`
-  Current supported value is `ujaydata`.
-
-  Later, when another provider is added, admin can switch this value and the frontend endpoints will stay the same.
-
+  Supported values are `smeapi` and `ujaydata`.
+  
+  `smeapi` is the primary data provider. `ujaydata` is the backup provider. Admin can switch this value anytime and the frontend endpoints will stay the same.
+  
   `userMarkupPercent`
-  Percentage added on top of provider cost price for normal users.
-
+  Fallback percentage for normal users. Backend uses this only when no `userPricingTiers` range matches the provider `costPrice`.
+  
   `vendorMarkupPercent`
-  Percentage added on top of provider cost price for active vendors.
+  Fallback percentage for active vendors. Backend uses this only when no `vendorPricingTiers` range matches the provider `costPrice`.
 
+  `userPricingTiers`
+  Optional tiered percentage rules for normal users.
+
+  `vendorPricingTiers`
+  Optional tiered percentage rules for vendors.
+
+  Each tier has:
+
+  - `minCost`: provider cost price must be at least this amount
+  - `maxCost`: provider cost price must be at most this amount
+  - `markupPercent`: percentage to add when this tier matches
+
+  Use `maxCost: null` for the last tier when there is no upper limit.
+  
   `roundingMode`
   Use `ceil` to round up to the next naira, or `round` to round normally.
 
-  ## Example
+  ## Recommended MVP Tier Structure
 
-  If provider price is `N199` and `userMarkupPercent` is `15`, frontend will see:
+  Normal users:
 
   ```txt
-  N199 + 15% = N228.85
-  ceil = N229
+  cost 0 - 500        => 15%
+  cost 501 - 1500     => 10%
+  cost 1501 - 3000    => 7%
+  cost 3001 - 6000    => 5%
+  cost 6001 and above => 3%
   ```
 
-  ## Expected Response
+  Vendors:
 
+  ```txt
+  cost 0 - 500        => 10%
+  cost 501 - 1500     => 7%
+  cost 1501 - 3000    => 5%
+  cost 3001 - 6000    => 3%
+  cost 6001 and above => 2%
+  ```
+
+  This keeps small bundles profitable but stops big bundles from becoming too expensive.
+  
+  ## Example
+  
+  To switch to UjayData with tiered pricing:
+  
+  ```json
+  {
+    "isEnabled": true,
+    "activeProvider": "ujaydata",
+    "userMarkupPercent": 15,
+    "vendorMarkupPercent": 10,
+    "roundingMode": "ceil",
+    "userPricingTiers": [
+      { "minCost": 0, "maxCost": 500, "markupPercent": 15 },
+      { "minCost": 501, "maxCost": 1500, "markupPercent": 10 },
+      { "minCost": 1501, "maxCost": 3000, "markupPercent": 7 },
+      { "minCost": 3001, "maxCost": 6000, "markupPercent": 5 },
+      { "minCost": 6001, "maxCost": null, "markupPercent": 3 }
+    ],
+    "vendorPricingTiers": [
+      { "minCost": 0, "maxCost": 500, "markupPercent": 10 },
+      { "minCost": 501, "maxCost": 1500, "markupPercent": 7 },
+      { "minCost": 1501, "maxCost": 3000, "markupPercent": 5 },
+      { "minCost": 3001, "maxCost": 6000, "markupPercent": 3 },
+      { "minCost": 6001, "maxCost": null, "markupPercent": 2 }
+    ]
+  }
+  ```
+  
+  To remove tiered pricing and use flat percentages only:
+  
+  ```json
+  {
+    "isEnabled": true,
+    "activeProvider": "smeapi",
+    "userMarkupPercent": 15,
+    "vendorMarkupPercent": 10,
+    "roundingMode": "ceil",
+    "userPricingTiers": [],
+    "vendorPricingTiers": []
+  }
+  ```
+  
+  ## Price Calculation
+  
+  If provider cost is `199` and the matched markup is `15%`:
+  
+  ```txt
+  199 + 15% = 228.85
+  ceil = 229
+  sellingPrice = 229
+  profit = 30
+  ```
+
+  If provider cost is `10700` and the matched markup is `3%`:
+
+  ```txt
+  10700 + 3% = 11021
+  sellingPrice = 11021
+  profit = 321
+  ```
+
+  Without tiered pricing, 15% on `10700` would produce `12305`, which is too expensive for large packages.
+
+  ## Frontend Notes
+
+  The normal user app should not call this endpoint.
+
+  The admin dashboard can call this endpoint to update pricing rules.
+
+  The user app should only fetch final data prices from:
+
+  ```txt
+  GET /api/v1/services/data/plans
+  ```
+
+  The frontend should display `sellingPrice` only. Backend already calculates markup, profit, and tier matching.
+  
+  ## Expected Response
+  
   ```json
   {
     "message": "Data service settings updated successfully",
@@ -81,7 +216,21 @@ docs {
       "activeProvider": "ujaydata",
       "userMarkupPercent": 15,
       "vendorMarkupPercent": 10,
-      "roundingMode": "ceil"
+      "roundingMode": "ceil",
+      "userPricingTiers": [
+        {
+          "minCost": 0,
+          "maxCost": 500,
+          "markupPercent": 15
+        }
+      ],
+      "vendorPricingTiers": [
+        {
+          "minCost": 0,
+          "maxCost": 500,
+          "markupPercent": 10
+        }
+      ]
     }
   }
   ```
