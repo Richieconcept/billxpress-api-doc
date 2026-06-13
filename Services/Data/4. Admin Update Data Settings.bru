@@ -22,7 +22,7 @@ auth:bearer {
 body:json {
   {
     "isEnabled": true,
-    "activeProvider": "ujaydata",
+    "activeProvider": "smeapi",
     "userMarkupPercent": 15,
     "vendorMarkupPercent": 10,
     "roundingMode": "ceil",
@@ -43,13 +43,17 @@ body:json {
   }
 }
 
+vars:pre-request {
+  authToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTFlOGZlM2NiODVhYzVmYjkxN2E0YjIiLCJyb2xlIjoiYWRtaW4iLCJhdXRoVGllciI6InRpZXJfMSIsImlhdCI6MTc4MTE4MDgzNywiZXhwIjoxNzgxNzg1NjM3fQ.NIwnm1N5mB84IROXkg1hIz-tK3HVmjn0-Y4L7K9PVl0
+}
+
 docs {
   # Admin Update Data Settings
   
   Admin updates data service provider and markup settings.
-
+  
   Use this request when admin wants to:
-
+  
   - switch between `smeapi` and `ujaydata`
   - change normal user fallback percentage
   - change vendor fallback percentage
@@ -86,28 +90,28 @@ docs {
   
   `vendorMarkupPercent`
   Fallback percentage for active vendors. Backend uses this only when no `vendorPricingTiers` range matches the provider `costPrice`.
-
+  
   `userPricingTiers`
   Optional tiered percentage rules for normal users.
-
+  
   `vendorPricingTiers`
   Optional tiered percentage rules for vendors.
-
+  
   Each tier has:
-
+  
   - `minCost`: provider cost price must be at least this amount
   - `maxCost`: provider cost price must be at most this amount
   - `markupPercent`: percentage to add when this tier matches
-
+  
   Use `maxCost: null` for the last tier when there is no upper limit.
   
   `roundingMode`
   Use `ceil` to round up to the next naira, or `round` to round normally.
-
+  
   ## Recommended MVP Tier Structure
-
+  
   Normal users:
-
+  
   ```txt
   cost 0 - 500        => 15%
   cost 501 - 1500     => 10%
@@ -115,9 +119,9 @@ docs {
   cost 3001 - 6000    => 5%
   cost 6001 and above => 3%
   ```
-
+  
   Vendors:
-
+  
   ```txt
   cost 0 - 500        => 10%
   cost 501 - 1500     => 7%
@@ -125,7 +129,7 @@ docs {
   cost 3001 - 6000    => 3%
   cost 6001 and above => 2%
   ```
-
+  
   This keeps small bundles profitable but stops big bundles from becoming too expensive.
   
   ## Example
@@ -180,29 +184,29 @@ docs {
   sellingPrice = 229
   profit = 30
   ```
-
+  
   If provider cost is `10700` and the matched markup is `3%`:
-
+  
   ```txt
   10700 + 3% = 11021
   sellingPrice = 11021
   profit = 321
   ```
-
+  
   Without tiered pricing, 15% on `10700` would produce `12305`, which is too expensive for large packages.
-
+  
   ## Frontend Notes
-
+  
   The normal user app should not call this endpoint.
-
+  
   The admin dashboard can call this endpoint to update pricing rules.
-
+  
   The user app should only fetch final data prices from:
-
+  
   ```txt
   GET /api/v1/services/data/plans
   ```
-
+  
   The frontend should display `sellingPrice` only. Backend already calculates markup, profit, and tier matching.
   
   ## Expected Response

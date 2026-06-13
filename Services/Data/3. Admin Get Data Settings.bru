@@ -18,15 +18,19 @@ auth:bearer {
   token: {{authToken}}
 }
 
+vars:pre-request {
+  authToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTFlOGZlM2NiODVhYzVmYjkxN2E0YjIiLCJyb2xlIjoiYWRtaW4iLCJhdXRoVGllciI6InRpZXJfMSIsImlhdCI6MTc4MTE3OTU0MSwiZXhwIjoxNzgxNzg0MzQxfQ.eBvZfA2NVU1Pto6PvZgOFrhdss_supzXydCqmdbRsSE
+}
+
 docs {
   # Admin Get Data Settings
   
   Admin checks the active data provider and markup settings.
-
+  
   Use this request after updating data settings to confirm what is active.
-
+  
   If `userPricingTiers` or `vendorPricingTiers` is not empty, tiered pricing is enabled.
-
+  
   If a plan does not match any tier, backend falls back to `userMarkupPercent` or `vendorMarkupPercent`.
   
   ## Endpoint
