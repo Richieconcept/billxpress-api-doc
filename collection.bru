@@ -128,6 +128,28 @@ docs {
 
   The backend debits the wallet, calls the active provider, and refunds automatically if the provider fails.
 
+  ## Admin Dashboard Provider Balance
+
+  The admin dashboard earnings endpoint also returns provider wallet balances:
+
+  ```txt
+  GET /api/v1/admin/dashboard/earnings
+  ```
+
+  Frontend can display SMEAPI balance from:
+
+  ```txt
+  providerBalances.smeapi.balance
+  ```
+
+  Only show the balance when:
+
+  ```txt
+  providerBalances.smeapi.available === true
+  ```
+
+  If `available` is `false`, show an unavailable state while keeping the rest of the dashboard visible.
+
   ## Airtime Service Rule
 
   The frontend should fetch airtime networks from:

@@ -48,7 +48,7 @@ docs {
   ## Body Fields
 
   `amount`  
-  Required. Amount to move from referral wallet to main wallet.
+  Required. Amount to move from referral wallet to main wallet. Users can redeem any positive amount they have earned.
 
   `transactionPin`  
   Required. User's 4-digit transaction PIN.
@@ -81,14 +81,6 @@ docs {
 
   ## Common Errors
 
-  Referral balance is below the minimum. Current default minimum is `NGN 100`:
-
-  ```json
-  {
-    "message": "Minimum referral redeem amount is 100"
-  }
-  ```
-
   Wrong transaction PIN:
 
   ```json
@@ -107,7 +99,7 @@ docs {
 
   ## Frontend Notes
 
-  Only show the redeem button when `referralBalance` is at least the minimum redeem amount.
+  Show the redeem button when `referralBalance` is greater than `0`.
 
   Referral earnings are credited from first-deposit referral rewards. If User B funds `NGN 1,000` for the first time after registering with User A's referral code, User A earns `3%`, which is `NGN 30`.
 }
