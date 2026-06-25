@@ -1,0 +1,73 @@
+meta {
+  name: 6. Get Transfer Banks
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/wallet/transfers/banks
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  # Get Transfer Banks
+
+  Use this endpoint to show the bank picker for sending money.
+
+  ## Endpoint
+
+  `GET /api/v1/wallet/transfers/banks`
+
+  ## Authentication
+
+  Required.
+
+  ```txt
+  Authorization: Bearer {{authToken}}
+  ```
+
+  ## Success Response
+
+  ```json
+  {
+    "banks": [
+      {
+        "name": "OPay",
+        "slug": "opay",
+        "bankCode": "760",
+        "mapleradBankCode": "760",
+        "availableForTransfer": true,
+        "resolverProvider": "maplerad",
+        "transferProvider": "maplerad"
+      }
+    ],
+    "meta": {
+      "mapleradCount": 637,
+      "availableCount": 637,
+      "cacheTtlMs": 3600000,
+      "resolverProvider": "maplerad",
+      "transferProvider": "maplerad"
+    },
+    "cached": false
+  }
+  ```
+
+  ## Frontend Flow
+
+  - call this endpoint when opening the send money screen
+  - user selects a bank from `banks`
+  - call resolve account with `bank.mapleradBankCode` or `bank.bankCode`
+  - show returned account name
+  - call send transfer with `mapleradBankCode`
+
+  The list is powered by Maplerad NUBAN institutions.
+}
