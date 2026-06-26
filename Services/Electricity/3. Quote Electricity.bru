@@ -1,0 +1,55 @@
+meta {
+  name: 3. Quote Electricity
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/services/electricity/quote
+  body: json
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "amount": 2000
+  }
+}
+
+vars:pre-request {
+  authToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTFlOGZlM2NiODVhYzVmYjkxN2E0YjIiLCJyb2xlIjoiYWRtaW4iLCJhdXRoVGllciI6InRpZXJfMiIsImlhdCI6MTc4MjQ3OTcwMSwiZXhwIjoxNzgzMDg0NTAxfQ.HsPmKYJTneCDF4uGM1Rky8Ecw_jUtBnoACmpofFnVkc
+}
+
+docs {
+  # Quote Electricity
+  
+  Use this endpoint to calculate what the user will pay after markup.
+  
+  ## Body
+  
+  `amount`
+  Required. Electricity value in naira.
+  
+  ## Response
+  
+  ```json
+  {
+    "quote": {
+      "amount": 2000,
+      "sellingPrice": 2000,
+      "profit": 0,
+      "markupPercent": 0,
+      "roundingMode": "ceil"
+    }
+  }
+  ```
+}
