@@ -36,13 +36,13 @@ body:json {
 }
 
 vars:pre-request {
-  authToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTM5NTE2OTIwZTc5MzM1ODBhZWYyYmYiLCJyb2xlIjoidXNlciIsImF1dGhUaWVyIjoidGllcl8xIiwiaWF0IjoxNzgyMTQxMzEwLCJleHAiOjE3ODI3NDYxMTB9.6xbLVKIFUbrZBO4xWAst62a81hwQpFPKkOJLXTTtXPQ
+  authToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTIwMzI5YjcyYWRhZjAyMjQwYmQ0YmQiLCJyb2xlIjoidmVuZG9yIiwiYXV0aFRpZXIiOiJ0aWVyXzIiLCJpYXQiOjE3ODI1NzgxODksImV4cCI6MTc4MzE4Mjk4OX0.iPWDivzyd8OO0z-_EljxJ3ZJe-baquG9bGY3afnfLdM
 }
 
 docs {
   # Upgrade My Maplerad Tier 1
   
-  Upgrades the logged-in user to BillXpress `tier_2` by creating/upgrading their Maplerad customer to Maplerad Tier 1, then creates a dedicated NGN virtual account.
+  Upgrades the logged-in user to BillXpress `tier_3` by creating/upgrading their Maplerad customer to Maplerad Tier 1, then creates a dedicated NGN virtual account.
   
   ## Endpoint
   
@@ -50,7 +50,7 @@ docs {
   
   ## Authentication
   
-  Required.
+  Required. The user's email must already be verified.
   
   ```txt
   Authorization: Bearer {{authToken}}
@@ -79,7 +79,7 @@ docs {
   {
     "message": "Tier upgrade completed successfully",
     "user": {
-      "authTier": "tier_2",
+      "authTier": "tier_3",
       "kycLevel": 1
     },
     "mapleradCustomer": {
