@@ -1,0 +1,28 @@
+meta {
+  name: 9. Customer Airtel Awoof Plans
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/v1/services/data/plans?network=AIRTEL&type=AWOOF
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+docs {
+  # Customer Airtel Awoof Plans
+
+  Returns only enabled and provider-available Airtel Awoof plans.
+
+  If this returns an empty array, check the admin list and confirm that at least
+  one matching plan has both `ourPrice` set and `isEnabled: true`.
+}

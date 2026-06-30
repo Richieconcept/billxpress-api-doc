@@ -22,5 +22,15 @@ docs {
   PATCH /api/v1/admin/services/data/settings
   ```
 
-  The backend fetches live plans from the active provider, applies BillXpress markup, debits wallet on purchase, and refunds automatically if provider purchase fails.
+  SME Plug catalogue endpoints:
+
+  ```txt
+  POST  /api/v1/admin/services/data/plans/sync
+  GET   /api/v1/admin/services/data/plans
+  PATCH /api/v1/admin/services/data/plans/:planId
+  ```
+
+  SME Plug plans are synchronized into BillXpress. New plans are disabled by
+  default. Admin sets `ourPrice` and enables only the plans that the hosted SIM
+  can vend. Customer requests return enabled plans only.
 }

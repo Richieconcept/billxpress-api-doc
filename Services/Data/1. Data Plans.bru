@@ -18,86 +18,90 @@ auth:bearer {
   token: {{authToken}}
 }
 
+vars:pre-request {
+  authToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTFlOGZlM2NiODVhYzVmYjkxN2E0YjIiLCJyb2xlIjoiYWRtaW4iLCJhdXRoVGllciI6InRpZXJfMiIsImlhdCI6MTc4MjgyNDE5NSwiZXhwIjoxNzgzNDI4OTk1fQ.1cVLyOmQtwzpu6WpbQcGA5JqfpgGqBg8eP2srPnr7x8
+}
+
 docs {
   # Data Plans
-
+  
   Fetches live data plans from the active backend provider and returns BillXpress selling prices.
-
+  
   ## Endpoint
-
+  
   `GET /api/v1/services/data/plans`
-
+  
   ## Authentication
-
+  
   Required.
-
+  
   ```txt
   Authorization: Bearer {{authToken}}
   ```
-
+  
   ## Important For Frontend
-
+  
   Display `sellingPrice` to the user.
-
+  
   Do not display `costPrice` as the amount to pay. `costPrice` is included only so admins/testers can understand pricing.
-
+  
   Do not calculate price on the frontend. The backend already:
-
+  
   - fetches provider cost price
   - checks whether the logged-in user is normal user or active vendor
   - applies the correct tier or fallback markup
   - rounds the final amount
   - returns `sellingPrice`
-
+  
   The backend fetches the live provider price on every request, then applies markup:
-
+  
   - normal user uses `userPricingTiers` when a matching tier exists
   - active vendor uses `vendorPricingTiers` when a matching tier exists
   - if no tier matches, backend falls back to `userMarkupPercent` or `vendorMarkupPercent`
-
+  
   Each plan returns the exact `markupPercent`, `pricingModel`, `sellingPrice`, and `profit` used for that user.
-
+  
   ## Fields Frontend Should Use
-
+  
   `id`
   Send this value as `planId` when buying data.
-
+  
   `network`
   Use this to group plans under MTN, GLO, AIRTEL, or 9MOBILE.
-
+  
   `name`
   Display as the bundle size, for example `500MB` or `10GB`.
-
+  
   `type`
   Display as plan type, for example `SME`, `Gifting`, or `Corporate`.
-
+  
   `validity`
   Display as the plan duration, for example `30 days`.
-
+  
   `sellingPrice`
   This is the amount the user will pay from their BillXpress wallet.
-
+  
   ## Fields Frontend Should Not Use For Payment
-
+  
   `costPrice`
   Provider cost price. Do not charge the user this amount.
-
+  
   `profit`
   BillXpress earning on this plan. This is useful for admin/testing, but should not be shown to normal users.
-
+  
   `pricingTier`
   Shows which admin tier was used. Useful for admin/testing.
-
+  
   ## Pricing Model Meaning
-
+  
   `pricingModel: "tiered"`
   A matching admin pricing tier was used.
-
+  
   `pricingModel: "flat"`
   No tier matched, so backend used `userMarkupPercent` or `vendorMarkupPercent`.
-
+  
   ## Expected Response
-
+  
   ```json
   {
     "provider": "smeapi",
