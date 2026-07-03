@@ -23,6 +23,12 @@ body:json {
   {
     "isEnabled": true,
     "activeProvider": "smeapi",
+    "networkProviders": {
+      "MTN": "smeapi",
+      "AIRTEL": "smeplug",
+      "GLO": "smeplug",
+      "9MOBILE": "smeplug"
+    },
     "userMarkupPercent": 15,
     "vendorMarkupPercent": 10,
     "roundingMode": "ceil",
@@ -50,11 +56,11 @@ vars:pre-request {
 docs {
   # Admin Update Data Settings
   
-  Admin updates data service provider and markup settings.
+  Admin updates data service provider routing and markup settings.
   
   Use this request when admin wants to:
   
-  - switch between `smeapi` and `ujaydata`
+  - choose a provider independently for each mobile network
   - change normal user fallback percentage
   - change vendor fallback percentage
   - configure tiered margins so small plans stay profitable and big plans stay affordable
@@ -81,9 +87,29 @@ docs {
   Use `true` to allow data purchases or `false` to temporarily disable data service.
   
   `activeProvider`
-  Supported values are `smeapi` and `ujaydata`.
+  Global fallback provider used when a network does not have an explicit entry
+  in `networkProviders`.
   
-  `smeapi` is the primary data provider. `ujaydata` is the backup provider. Admin can switch this value anytime and the frontend endpoints will stay the same.
+  `networkProviders`
+  Optional object with `MTN`, `AIRTEL`, `GLO`, and `9MOBILE`. Supported provider
+  values are `smeapi`, `smeplug`, `autopilot`, and `ujaydata`.
+
+  Example: route MTN through SMEAPI while Airtel, Glo, and 9mobile use SME Plug:
+
+  ```json
+  {
+    "networkProviders": {
+      "MTN": "smeapi",
+      "AIRTEL": "smeplug",
+      "GLO": "smeplug",
+      "9MOBILE": "smeplug"
+    }
+  }
+  ```
+
+  Switching `MTN` to `smeplug` immediately exposes the previously enabled SME
+  Plug MTN catalogue. Switching it back restores the SMEAPI MTN catalogue and
+  its saved prices.
   
   `userMarkupPercent`
   Fallback percentage for normal users. Backend uses this only when no `userPricingTiers` range matches the provider `costPrice`.
@@ -218,6 +244,12 @@ docs {
       "service": "data",
       "isEnabled": true,
       "activeProvider": "ujaydata",
+      "networkProviders": {
+        "MTN": "smeapi",
+        "AIRTEL": "smeplug",
+        "GLO": "smeplug",
+        "9MOBILE": "smeplug"
+      },
       "userMarkupPercent": 15,
       "vendorMarkupPercent": 10,
       "roundingMode": "ceil",

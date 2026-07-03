@@ -1,5 +1,5 @@
 meta {
-  name: 5. Admin Sync SME Plug Plans
+  name: 5. Admin Sync Provider Plans
   type: http
   seq: 5
 }
@@ -30,14 +30,41 @@ vars:pre-request {
 }
 
 docs {
-  # Synchronize SME Plug Plans
-
-  Fetches the current plan catalogue from SME Plug and saves it in BillXpress.
+  # Synchronize Provider Plans
+  
+  Fetches the current plan catalogue from SME Plug or SMEAPI and saves it in
+  BillXpress. Send `"provider": "smeplug"` or `"provider": "smeapi"`.
 
   New plans are created with `isEnabled: false` and `ourPrice: null`. A later
   synchronization updates provider/network prices but preserves our price,
   datatype, enabled status, and delivery controls.
 
-  Run this request after configuring `SMEPLUG_API_TOKEN`, and whenever SME Plug
-  changes its plans.
+  Run separately for both catalogue providers:
+
+  ```json
+  { "provider": "smeapi" }
+  ```
+
+  ```json
+  { "provider": "smeplug" }
+  ```
+
+  Synchronize after configuring the provider credentials and whenever the
+  provider changes its catalogue. Synchronization does not activate a provider
+  for a network; use Data Settings for routing.
+
+  Expected response:
+
+  ```json
+  {
+    "message": "Data plans synchronized successfully",
+    "sync": {
+      "provider": "smeapi",
+      "received": 119,
+      "available": 119,
+      "disabledByProvider": 0,
+      "syncedAt": "2026-07-02T00:00:00.000Z"
+    }
+  }
+  ```
 }

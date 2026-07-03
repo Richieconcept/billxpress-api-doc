@@ -40,9 +40,34 @@ docs {
   Set `dataPlanId` in the active Bruno environment to the plan's database `id`
   returned by the admin list request.
 
-  `networkPrice` and `providerPrice` come from SME Plug and cannot be changed
+  `networkPrice` and `providerPrice` come from SMEAPI or SME Plug and cannot be changed
   here. `ourPrice`, `dataType`, availability, and delivery controls belong to
   BillXpress and are preserved during synchronization.
+
+  ## Fixed Price
+
+  ```json
+  {
+    "ourPrice": 450,
+    "isEnabled": true
+  }
+  ```
+
+  `ourPrice` becomes the exact customer selling price. No percentage is added.
+
+  ## Percentage Fallback
+
+  ```json
+  {
+    "ourPrice": null,
+    "isEnabled": true
+  }
+  ```
+
+  Clearing `ourPrice` restores tier/percentage pricing. The plan can remain
+  enabled.
+
+  The backend rejects enabling a provider-unavailable plan.
 
   To hide a plan:
 

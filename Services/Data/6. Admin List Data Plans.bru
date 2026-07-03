@@ -23,9 +23,9 @@ vars:pre-request {
 }
 
 docs {
-  # Admin List All SME Plug Plans
-
-  Returns enabled and disabled plans. Copy a plan's `id` into the `dataPlanId`
+  # Admin List Saved Provider Plans
+  
+  Returns enabled and disabled SMEAPI or SME Plug plans. Copy a plan's `id` into the `dataPlanId`
   Bruno environment variable before running the update request.
 
   Optional query filters:
@@ -42,4 +42,24 @@ docs {
   ```txt
   /api/v1/admin/services/data/plans?provider=smeplug&network=AIRTEL&type=AWOOF
   ```
+
+  For SMEAPI MTN plans:
+
+  ```txt
+  /api/v1/admin/services/data/plans?provider=smeapi&network=MTN
+  ```
+
+  Admin UI should show:
+
+  - provider and network;
+  - provider plan name/type/validity;
+  - `networkPrice`, `providerPrice`, and `costPrice`;
+  - editable `ourPrice`;
+  - `isEnabled`;
+  - `providerAvailable`;
+  - `lastSyncedAt`.
+
+  `isEnabled` is BillXpress's choice. `providerAvailable` is the upstream
+  provider's current status. A plan must satisfy both before customers can see
+  it.
 }
