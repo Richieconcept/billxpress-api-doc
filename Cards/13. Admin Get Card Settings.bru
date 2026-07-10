@@ -81,19 +81,73 @@ docs {
       },
       "fundingFee": {
         "percent": 0,
-        "flat": 0
+        "flat": 0,
+        "thresholdAmount": 0,
+        "belowThresholdFlat": 0,
+        "aboveThresholdPercent": 0
       },
       "providerFundingFee": {
         "percent": 0,
-        "flat": 0
+        "flat": 0,
+        "thresholdAmount": 100,
+        "belowThresholdFlat": 1,
+        "aboveThresholdPercent": 2
       },
       "withdrawalFee": {
         "percent": 0,
-        "flat": 0
+        "flat": 0,
+        "thresholdAmount": 0,
+        "belowThresholdFlat": 0,
+        "aboveThresholdPercent": 0
       },
       "providerWithdrawalFee": {
         "percent": 0,
-        "flat": 0
+        "flat": 1,
+        "thresholdAmount": 0,
+        "belowThresholdFlat": 0,
+        "aboveThresholdPercent": 0
+      },
+      "crossBorderFee": {
+        "percent": 0,
+        "flat": 0,
+        "thresholdAmount": 0,
+        "belowThresholdFlat": 0,
+        "aboveThresholdPercent": 0
+      },
+      "providerCrossBorderFee": {
+        "percent": 2.5,
+        "flat": 0.5,
+        "thresholdAmount": 0,
+        "belowThresholdFlat": 0,
+        "aboveThresholdPercent": 0
+      },
+      "chargebackFee": {
+        "percent": 0,
+        "flat": 0,
+        "thresholdAmount": 0,
+        "belowThresholdFlat": 0,
+        "aboveThresholdPercent": 0
+      },
+      "providerChargebackFee": {
+        "percent": 0,
+        "flat": 45,
+        "thresholdAmount": 0,
+        "belowThresholdFlat": 0,
+        "aboveThresholdPercent": 0
+      },
+      "declineFee": {
+        "percent": 0,
+        "flat": 0,
+        "thresholdAmount": 0,
+        "belowThresholdFlat": 0,
+        "aboveThresholdPercent": 0
+      },
+      "providerDeclineFee": {
+        "percent": 0,
+        "flat": 0.5,
+        "thresholdAmount": 0,
+        "belowThresholdFlat": 0,
+        "aboveThresholdPercent": 0
       },
       "fundingExchangeMarkupPercent": 0,
       "withdrawalExchangeMarkupPercent": 0,
@@ -123,6 +177,56 @@ docs {
   `minimumFundingAmount`, `maximumFundingAmount`, `fundingFee`, and
   `providerFundingFee` do not affect card creation anymore. They apply when the
   user funds an already-created card.
+
+  Every fee object uses the same editable shape:
+
+  ```json
+  {
+    "percent": 0,
+    "flat": 0,
+    "thresholdAmount": 0,
+    "belowThresholdFlat": 0,
+    "aboveThresholdPercent": 0
+  }
+  ```
+
+  `thresholdAmount`, `belowThresholdFlat`, and `aboveThresholdPercent` are only
+  needed for tiered fees such as Maplerad card funding: charge `$1` below `$100`,
+  otherwise charge a percentage. Set `thresholdAmount` to `0` for normal
+  percent-plus-flat fees.
+
+  For card funding, the backend calculates:
+
+  - provider cost from `providerFundingFee`
+  - BillXpress markup from `fundingFee`
+  - customer total as provider cost plus BillXpress markup
+
+  Example for provider `2%` and BillXpress total markup to make customer charge
+  `3%` above `$100`:
+
+  ```json
+  {
+    "providerFundingFee": {
+      "percent": 0,
+      "flat": 0,
+      "thresholdAmount": 100,
+      "belowThresholdFlat": 1,
+      "aboveThresholdPercent": 2
+    },
+    "fundingFee": {
+      "percent": 1,
+      "flat": 0,
+      "thresholdAmount": 0,
+      "belowThresholdFlat": 0,
+      "aboveThresholdPercent": 0
+    }
+  }
+  ```
+
+  The extra incident/cross-border fields are admin-editable pricing controls:
+  `providerCrossBorderFee`, `crossBorderFee`, `providerChargebackFee`,
+  `chargebackFee`, `providerDeclineFee`, and `declineFee`. The frontend should
+  show provider fields as cost and non-provider fields as BillXpress markup.
 
   After saving changes with `PATCH /api/v1/admin/cards/settings`, re-fetch this endpoint or use the returned `settings` object.
 }

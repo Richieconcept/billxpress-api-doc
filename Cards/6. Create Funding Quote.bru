@@ -36,4 +36,18 @@ docs {
   Display `quote.exchangeRate`. It is the BillXpress customer rate and already
   includes the configured funding exchange markup. The raw Maplerad rate is
   admin-only.
+
+  Display `quote.fee` or `quote.summary.charges.fundingFee` as the total card
+  funding fee charged to the user. This total is calculated from admin card
+  settings:
+
+  - `providerFundingFee` is the provider/Maplerad cost.
+  - `fundingFee` is the BillXpress markup.
+  - `quote.feeBreakdown.providerFee` and `quote.feeBreakdown.billxpressFee`
+    show the two parts separately.
+
+  If admin configures tiered provider funding such as `$1` below `$100` and
+  `2%` from `$100` upward, the backend applies it automatically. The customer
+  app should not calculate this fee itself; it should show the values returned
+  in the quote.
 }

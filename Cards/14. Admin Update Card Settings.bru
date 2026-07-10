@@ -21,10 +21,22 @@ body:json {
     "defaultBrand": "VISA",
     "providerCreationFee": { "percent": 0, "flat": 2 },
     "creationFeeUsd": { "percent": 0, "flat": 3 },
-    "providerFundingFee": { "percent": 1, "flat": 0 },
+    "providerFundingFee": {
+      "percent": 0,
+      "flat": 0,
+      "thresholdAmount": 100,
+      "belowThresholdFlat": 1,
+      "aboveThresholdPercent": 2
+    },
     "fundingFee": { "percent": 1, "flat": 0 },
     "providerWithdrawalFee": { "percent": 0, "flat": 1 },
     "withdrawalFee": { "percent": 1, "flat": 0 },
+    "providerCrossBorderFee": { "percent": 2.5, "flat": 0.5 },
+    "crossBorderFee": { "percent": 0, "flat": 0 },
+    "providerChargebackFee": { "percent": 0, "flat": 45 },
+    "chargebackFee": { "percent": 0, "flat": 0 },
+    "providerDeclineFee": { "percent": 0, "flat": 0.5 },
+    "declineFee": { "percent": 0, "flat": 0 },
     "fundingExchangeMarkupPercent": 1,
     "withdrawalExchangeMarkupPercent": 1,
     "monthlyMaintenanceFee": 1,
@@ -133,6 +145,92 @@ docs {
   `fundingFee.flat` and `withdrawalFee.flat` remain NGN customer charges.
   `fundingFee`, `providerFundingFee`, `minimumFundingAmount`, and
   `maximumFundingAmount` apply only to separate card funding, not card creation.
+
+  ## Fee Object Shape
+
+  Every card fee object accepts:
+
+  ```json
+  {
+    "percent": 0,
+    "flat": 0,
+    "thresholdAmount": 0,
+    "belowThresholdFlat": 0,
+    "aboveThresholdPercent": 0
+  }
+  ```
+
+  `percent`
+  Normal percentage fee.
+
+  `flat`
+  Normal flat fee.
+
+  `thresholdAmount`
+  Amount where tiered pricing starts. Use `0` when the fee is normal
+  percent-plus-flat.
+
+  `belowThresholdFlat`
+  Flat fee charged when the amount is below `thresholdAmount`.
+
+  `aboveThresholdPercent`
+  Percentage fee charged when the amount is greater than or equal to
+  `thresholdAmount`.
+
+  The backend stores money values in minor units internally, but the admin API
+  sends and receives normal display amounts. Example: send `1` for `$1`, `0.5`
+  for `$0.50`, and `45` for `$45`.
+
+  ## Card Funding Fee Example
+
+  Maplerad card funding cost can be configured without hardcoding:
+
+  ```json
+  {
+    "providerFundingFee": {
+      "percent": 0,
+      "flat": 0,
+      "thresholdAmount": 100,
+      "belowThresholdFlat": 1,
+      "aboveThresholdPercent": 2
+    },
+    "fundingFee": {
+      "percent": 1,
+      "flat": 0
+    }
+  }
+  ```
+
+  This means:
+
+  - provider cost is `$1` when card funding is below `$100`
+  - provider cost is `2%` when card funding is `$100` or above
+  - BillXpress adds `1%`
+  - customer total above `$100` is `3%`
+
+  The frontend admin screen should show `providerFundingFee` as provider cost
+  and `fundingFee` as BillXpress markup.
+
+  ## Other Card Provider Fees
+
+  These fields are editable so the admin dashboard can match provider pricing
+  and add BillXpress markup without code changes:
+
+  ```json
+  {
+    "providerCrossBorderFee": { "percent": 2.5, "flat": 0.5 },
+    "crossBorderFee": { "percent": 0, "flat": 0 },
+    "providerChargebackFee": { "percent": 0, "flat": 45 },
+    "chargebackFee": { "percent": 0, "flat": 0 },
+    "providerDeclineFee": { "percent": 0, "flat": 0.5 },
+    "declineFee": { "percent": 0, "flat": 0 }
+  }
+  ```
+
+  Provider fields are cost fields. Non-provider fields are BillXpress markup
+  fields. The current backend exposes and stores these settings for the admin
+  dashboard; card funding quotes actively use `providerFundingFee` and
+  `fundingFee`.
 
   `monthlyMaintenanceFee` is USD and is converted at the current Maplerad rate.
   Percentage values are entered as normal percentages, for example `1` = 1%.
