@@ -82,16 +82,16 @@ docs {
       "fundingFee": {
         "percent": 0,
         "flat": 0,
+        "thresholdAmount": 100000,
+        "belowThresholdFlat": 2000,
+        "aboveThresholdPercent": 3
+      },
+      "providerFundingFee": {
+        "percent": 2,
+        "flat": 0,
         "thresholdAmount": 0,
         "belowThresholdFlat": 0,
         "aboveThresholdPercent": 0
-      },
-      "providerFundingFee": {
-        "percent": 0,
-        "flat": 0,
-        "thresholdAmount": 100,
-        "belowThresholdFlat": 1,
-        "aboveThresholdPercent": 2
       },
       "withdrawalFee": {
         "percent": 0,
@@ -191,34 +191,34 @@ docs {
   ```
 
   `thresholdAmount`, `belowThresholdFlat`, and `aboveThresholdPercent` are only
-  needed for tiered fees such as Maplerad card funding: charge `$1` below `$100`,
-  otherwise charge a percentage. Set `thresholdAmount` to `0` for normal
-  percent-plus-flat fees.
+  needed for tiered fees such as customer card funding: charge `NGN 2,000`
+  below `NGN 100,000`, otherwise charge a percentage. Set `thresholdAmount` to
+  `0` for normal percent-plus-flat fees.
 
   For card funding, the backend calculates:
 
   - provider cost from `providerFundingFee`
-  - BillXpress markup from `fundingFee`
-  - customer total as provider cost plus BillXpress markup
+  - customer total from `fundingFee`
+  - BillXpress margin as customer total minus provider cost
 
-  Example for provider `2%` and BillXpress total markup to make customer charge
-  `3%` above `$100`:
+  Example for provider `2%`, customer charge `NGN 2,000` below `NGN 100,000`,
+  and customer charge `3%` from `NGN 100,000` upward:
 
   ```json
   {
     "providerFundingFee": {
-      "percent": 0,
-      "flat": 0,
-      "thresholdAmount": 100,
-      "belowThresholdFlat": 1,
-      "aboveThresholdPercent": 2
-    },
-    "fundingFee": {
-      "percent": 1,
+      "percent": 2,
       "flat": 0,
       "thresholdAmount": 0,
       "belowThresholdFlat": 0,
       "aboveThresholdPercent": 0
+    },
+    "fundingFee": {
+      "percent": 0,
+      "flat": 0,
+      "thresholdAmount": 100000,
+      "belowThresholdFlat": 2000,
+      "aboveThresholdPercent": 3
     }
   }
   ```
@@ -226,7 +226,8 @@ docs {
   The extra incident/cross-border fields are admin-editable pricing controls:
   `providerCrossBorderFee`, `crossBorderFee`, `providerChargebackFee`,
   `chargebackFee`, `providerDeclineFee`, and `declineFee`. The frontend should
-  show provider fields as cost and non-provider fields as BillXpress markup.
+  show provider fields as cost. For funding, show `fundingFee` as the total
+  customer charge, not as a fee added on top of provider cost.
 
   After saving changes with `PATCH /api/v1/admin/cards/settings`, re-fetch this endpoint or use the returned `settings` object.
 }
