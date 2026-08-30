@@ -41,7 +41,7 @@ docs {
   
   ```txt
   network=MTN|AIRTEL|GLO|9MOBILE
-  type=AWOOF|GIFTING|SME|CORPORATE GIFTING|SOCIAL|OTHER
+  type=AWOOF|GIFTING|SME|CORPORATE GIFTING|DATA SHARE|SOCIAL|OTHER
   isEnabled=true|false
   providerAvailable=true|false
   customerVisible=true|false
@@ -126,6 +126,12 @@ docs {
   ```txt
   /api/v1/admin/services/data/plans?network=MTN&customerVisible=true&sortBy=provider
   ```
+
+  For MTN 2Fast datashare inventory plans:
+
+  ```txt
+  /api/v1/admin/services/data/plans?provider=2fast&network=MTN&type=DATA%20SHARE
+  ```
   
   For Autopilot MTN plans:
   
@@ -138,10 +144,14 @@ docs {
   - provider and network;
   - provider plan name/type/validity;
   - `networkPrice`, `providerPrice`, and `costPrice`;
+  - `costSource`, showing which cost is used for markup/profit;
   - editable `ourPrice` for normal app users;
   - editable `vendorPrice` for API/vendor users;
   - `isEnabled`;
   - `providerAvailable`;
+  - `available`, meaning the upstream provider can currently sell the plan;
+  - `customerAvailable`, meaning BillXpress enabled the plan and customers can
+    currently see/buy it;
   - `lastSyncedAt`.
 
   The normal customer app must not use this endpoint. It should use:
@@ -155,8 +165,9 @@ docs {
   to.
   
   `isEnabled` is BillXpress's choice. `providerAvailable` is the upstream
-  provider's current status. A plan must satisfy both before customers can see
-  it.
+  provider's current status. `available` tracks provider availability.
+  `customerAvailable` tracks customer visibility. A plan must satisfy both
+  provider availability and BillXpress enablement before customers can see it.
   
   `ourPrice` and `vendorPrice` are optional fixed selling prices. When either is
   set, that exact amount is used for that audience instead of percentage/tier
@@ -170,4 +181,17 @@ docs {
   - `costPrice`: effective cost used for fallback markup/profit. When
     `allowHostedSim` is true and `networkPrice` exists, this equals
     `networkPrice`; otherwise it falls back to `providerPrice`.
+  - `costSource`: `network`, `provider_wallet`, `network_fallback`, or
+    `inventory_or_zero`.
+
+  For plans sold from provider wallet/API, admin should set:
+
+  ```json
+  {
+    "allowHostedSim": false
+  }
+  ```
+
+  This makes `costPrice` use `providerPrice`, so profit becomes
+  `sellingPrice - providerPrice` instead of `sellingPrice - networkPrice`.
 }
